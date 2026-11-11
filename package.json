@@ -1,0 +1,39 @@
+{
+  "name": "google-ai-mode",
+  "displayName": "Google AI Mode",
+  "description": "Выделите код и откройте Google AI Mode с запросом на пояснение (Ctrl+Alt+G).",
+  "version": "0.1.0",
+  "publisher": "student",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [],
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "googleAiMode.search",
+        "title": "Google AI Mode: Пояснить выделение"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "googleAiMode.search",
+        "key": "ctrl+alt+g",
+        "mac": "cmd+alt+g",
+        "when": "editorTextFocus"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "googleAiMode.search",
+          "group": "navigation@99"
+        }
+      ]
+    }
+  }
+}
