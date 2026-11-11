@@ -1,15 +1,9 @@
 const vscode = require('vscode');
 const { buildAiModeUrl, SearchHistory } = require('./queryBuilder');
 
-/** @type {SearchHistory} */
 let history;
 
-/**
- * Точка входа расширения VS Code.
- * Регистрирует команду поиска выделенного кода в Google AI Mode.
- *
- * @param {vscode.ExtensionContext} context контекст расширения
- */
+// Запуск расширения: вешаем команду на Ctrl+Alt+G
 function activate(context) {
   history = new SearchHistory(10);
 
@@ -21,14 +15,11 @@ function activate(context) {
   context.subscriptions.push(disposable);
 }
 
-/**
- * Берёт выделение (или слово под курсором), собирает запрос на пояснение
- * и открывает Google AI Mode (`udm=50`) в системном браузере.
- */
+// Берём выделенный текст и открываем Google AI Mode
 async function searchSelectionInAiMode() {
   const editor = vscode.window.activeTextEditor;
   if (!editor) {
-    vscode.window.showInformationMessage('Google AI Mode: откройте файл и выделите текст');
+    vscode.window.showInformationMessage('Открой файл и выдели текст');
     return;
   }
 
@@ -39,34 +30,31 @@ async function searchSelectionInAiMode() {
   }
 
   if (!text) {
-    vscode.window.showInformationMessage('Google AI Mode: сначала выделите строчки кода');
+    vscode.window.showInformationMessage('Сначала выдели строчки кода');
     return;
   }
 
   const languageId = editor.document.languageId;
-  const { url, query, note } = buildAiModeUrl(text, languageId);
+  const { url, note } = buildAiModeUrl(text, languageId);
 
   history.push({
-    queryPreview: query.slice(0, 120),
+    preview: text.slice(0, 80),
     languageId,
     at: new Date().toISOString()
   });
 
   const opened = await vscode.env.openExternal(vscode.Uri.parse(url));
   if (!opened) {
-    vscode.window.showErrorMessage('Google AI Mode: не удалось открыть браузер');
+    vscode.window.showErrorMessage('Не удалось открыть браузер');
     return;
   }
 
   vscode.window.setStatusBarMessage(
-    `Google AI Mode: запрос отправлен (история: ${history.size()})${note ? ' · ' + note : ''}`,
-    5000
+    `Запрос отправлен` + (note ? ` (${note})` : '') + `. В истории: ${history.size()}`,
+    4000
   );
 }
 
-/**
- * Вызывается при выгрузке расширения.
- */
 function deactivate() {}
 
 module.exports = {
